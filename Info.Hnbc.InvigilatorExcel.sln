@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Info.Hnbc.InvigilatorExcel.WpfClient", "Info.Hnbc.InvigilatorExcel.WpfClient\Info.Hnbc.InvigilatorExcel.WpfClient.csproj", "{CBA6C91A-7253-4B14-A972-FAC6563C311C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Info.Hnbc.InvigilatorExcel.ExcelHandler", "Info.Hnbc.InvigilatorExcel.ExcelHandler\Info.Hnbc.InvigilatorExcel.ExcelHandler.csproj", "{5D7BA2EA-C7F2-4FDA-AD9D-0B64FBA5DCEA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBA6C91A-7253-4B14-A972-FAC6563C311C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBA6C91A-7253-4B14-A972-FAC6563C311C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBA6C91A-7253-4B14-A972-FAC6563C311C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBA6C91A-7253-4B14-A972-FAC6563C311C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D7BA2EA-C7F2-4FDA-AD9D-0B64FBA5DCEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D7BA2EA-C7F2-4FDA-AD9D-0B64FBA5DCEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D7BA2EA-C7F2-4FDA-AD9D-0B64FBA5DCEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D7BA2EA-C7F2-4FDA-AD9D-0B64FBA5DCEA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2DF52A43-ECB2-4D64-941B-C659497CF1A5}
+	EndGlobalSection
+EndGlobal
