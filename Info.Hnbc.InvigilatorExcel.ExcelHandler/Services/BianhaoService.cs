@@ -52,9 +52,9 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
             }
             ).ToList();
 
-            var categories = teachers.Items.Where(w => !string.IsNullOrWhiteSpace(w.Category)).Select(s => new CategoryInfo()
+            var categories = teachers.Items.Where(w => !string.IsNullOrWhiteSpace(w.Category)).Select(s => new SubjectInfo()
             {
-                Category = s.Category,
+                Subject = s.Category,
                 Letter = s.Letter
             }).ToList();
 
@@ -103,6 +103,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
 
             return new KaoshiAnpai
             {
+                Subjects = categories,
                 Teacher1 = teacher1,
                 Teacher2 = teacher2,
                 Rooms = rooms,
@@ -123,11 +124,12 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
             ExcelOperation.ExportComplexExcelWithOld(sheets.ToArray(), fileFullName, oldFileFullName,2);
 
         }
-        private static List<string> GetCategoryByLetters(string letters, List<CategoryInfo> categories)
+        private static List<SubjectInfo> GetCategoryByLetters(string letters, List<SubjectInfo> categories)
         {
             var cletters = letters.ToArray().Select(s => s.ToString()).ToList();
             var cs = categories.Where(w => cletters.Contains(w.Letter))
-                .Select(s => s.Category).ToList();
+                //.Select(s => s.Subject)
+                .ToList();
 
             return cs;
         }
@@ -245,22 +247,24 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
             var timegroups = ap.KaoshiInfos
                 .GroupBy(g =>
                 g.Time.Replace("上午", "").Replace("下午", "").Replace(".", "月") + "日"
-                + g.Type
+                + ((g.Type=="高考"|| g.Type == "选考")?"高考":g.Type)
                 )
                 .OrderBy(o => o.Key).ToList();
 
             foreach (var g in timegroups)
             {
-                var dto = GetOneDay(g.ToList(), g.Key);
+                var dto = GetOneDay(g.ToList(), g.Key,ap.Subjects);
                 result.Add(dto);
             }
             return result;
         }
 
 
-        private static ComplexExportDto GetOneDay(List<KaoshiInfo> ks,string name)
-        {
-            var subjects = ks.Select(s => s.Subject + "    " + s.Type).Distinct().ToList();
+        private static ComplexExportDto GetOneDay(List<KaoshiInfo> ks,string name, List<SubjectInfo> subjectInfos)
+        { 
+            //var subjects = ks.Select(s => s.Subject + "    " + s.Type).Distinct().ToList();
+            //var subjects = ks.Select(s => subjectInfos.FirstOrDefault(f=>f.Letter == s.SubjectLetter[0].ToString())?.Subject + "    " + s.Type).Distinct().ToList();
+            var subjects = ks.Select(s => s.SubjectLetter[0].ToString() + "_" + s.Type).Distinct().ToList();
 
 
             List<List<RowData>> data = new List<List<RowData>>();
@@ -275,14 +279,17 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
             for (int i = 0; i < subjects.Count; i++)
             {
                 var s = subjects[i];
-                cols.Add(new ExcelColumnDto(1, 1 + i*6, s, style: StyleConst.Header_Top()));
+                var s_split = s.Split('_');
+                var sname = subjectInfos.FirstOrDefault(f=>f.Letter == s_split[0])?.Subject+ "    "+s_split[1];
+                
+                cols.Add(new ExcelColumnDto(1, 1 + i*6, sname, style: StyleConst.Header_Top()));
                 cols.Add(new ExcelColumnDto(1, 2 + i*6, "教室", style: StyleConst.Header_Top()));
                 cols.Add(new ExcelColumnDto(1, 3 + i*6, "人数", style: StyleConst.Header_Top()));
                 cols.Add(new ExcelColumnDto(1, 4 + i*6, "监考甲", style: StyleConst.Header_Top()));
                 cols.Add(new ExcelColumnDto(1, 5 + i*6, "监考乙", style: StyleConst.Header_Top()));
                 cols.Add(new ExcelColumnDto(1, 6 + i*6, "验收\r\n人员", style: StyleConst.Header_Top_Right()));
 
-                var subjks = ks.Where(w => (w.Subject + "    " + w.Type) == s).ToList();
+                var subjks = ks.Where(w => (w.SubjectLetter[0] + "_" + w.Type) == s).ToList();
                 int index = 0;
                 foreach(var k in subjks)
                 {
@@ -290,7 +297,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
                     if(index>= data.Count)
                     {
                         row = new List<RowData>();
-                        row.Add(new RowData(0, index.ToString(), style: StyleConst.BaseItemStyle()));
+                        row.Add(new RowData(0, (index+1).ToString(), style: StyleConst.BaseItemStyle()));
                         data.Add(row);
                     }
                     else
@@ -311,6 +318,26 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
 
             }
 
+
+            //填充空白区域
+            var maxRowNum = data.Max(m => m.Count);
+            foreach(var d in data)
+            {
+                for(var i=0;i<maxRowNum;i++)
+                {
+                    var rd = d.FirstOrDefault(f=>f.RowIndex == i);
+                    if(rd==null)
+                    {
+                        var nrd = new RowData(i, "", StyleConst.BaseItemStyle());
+                        if (i== maxRowNum-1)
+                        {
+                            nrd = new RowData(i, "", StyleConst.Item_Right());
+                        }
+                        d.Add(nrd);
+                    }
+                }
+            }
+
             //添加最后一行封边
             var lastrow = new List<RowData>();
             for (int i = 0; i < 1 + subjects.Count * 6; i++)
@@ -318,6 +345,9 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
                 lastrow.Add(new RowData(i, "", StyleConst.Item_LastRow()));
             }
             data.Add(lastrow);
+            
+
+
 
             return new ComplexExportDto
             {

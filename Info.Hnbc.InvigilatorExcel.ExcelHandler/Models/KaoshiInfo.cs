@@ -9,6 +9,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
         public string ExamNo { get; set; }
 
         public string Subject { get; set; }
+        public string SubjectLetter { get; set; }
 
         public string Type { get; set; }
 
@@ -22,6 +23,10 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
         public Room Room { get; set; }
 
 
+        /// <summary>
+        /// 该科目同时考试场数
+        /// </summary>
+        public int SubjectCount { get; set; }
 
     }
     public class KaoshiTime

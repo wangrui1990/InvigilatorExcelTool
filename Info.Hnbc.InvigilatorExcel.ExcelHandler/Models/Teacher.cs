@@ -10,6 +10,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
         {
             Jiankao = new List<string>();
             JiankaoSubject = new List<string>();
+            JiankaoSubjectForAnpai = new List<string>();
             JiankaoType = new List<string>();
             JiankaoTime = new List<string>();
             JiankaoFee = new List<int>();
@@ -23,20 +24,24 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
 
         public int? LimitNum { get; set; }
 
-        public List<string> Limit { get; set; }
+        public List<SubjectInfo> Limit { get; set; }
 
-        public List<string> Must { get; set; }
+        public List<SubjectInfo> Must { get; set; }
         public List<string> Jiankao { get; set; }
         public List<string> JiankaoSubject { get; set; }
+        /// <summary>
+        /// 仅仅用来安排教师监考使用，不做表格处理
+        /// </summary>
+        public List<string> JiankaoSubjectForAnpai { get; set; }
         public List<string> JiankaoType { get; set; }
         public List<string> JiankaoTime { get; set; }
         public List<int> JiankaoFee { get; set; }
     }
 
 
-    public class CategoryInfo
+    public class SubjectInfo
     {
-        public string Category { get; set; }
+        public string Subject { get; set; }
 
         public string Letter { get; set; }
     }
