@@ -51,6 +51,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
 
             //场数多的考试优先安排，以防止最后因部分老师有监考场数限制而导致监考老师不足
             var kslist = KaoshiInfos.OrderByDescending(o => o.SubjectCount).ToList();
+            var ddd = kslist.Where(w=>w.Subject=="地理").ToList();
             foreach (var k in kslist)
             {
                 if (k.Subject == "生物")
@@ -58,17 +59,33 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
 
                 }
                 k.Teachers = new List<Teacher>();
-                 
+
+                Teacher1.ForEach(f => {
+                    f.Order = "";
+                    f.Order += (f.Limit.Count(c => c.Subject == k.Subject)>0) ? "01" : "00";
+                    f.Order += (f.Must.Count(c => c.Subject == k.Subject)>0) ? "00" : "01";
+                    f.Order += (f.Must.Count(c => c.Subject != k.Subject) > 0)?"01":"00";
+                    f.Order += (f.Subject == k.Subject) ?"01":"00";
+                    f.Order += (f.JiankaoTime.Contains(k.Time)) ?"00":"01";
+                    f.Order += f.Jiankao.Count.ToString().PadLeft(3,'0');
+                });
+
                 var t1 = Teacher1
-                    .Where(w => w.Subject != k.Subject) //教师不可监考自己教学的科目
-                    .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject)) //已经安排了同一科目考试监考的教师排除
-                    .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value)) //排除掉超过监考限制的教师
-                    .OrderByDescending(o => o.Must.Count(c=>c.Subject == k.Subject)) //优先选择设置了必须监考的教师
-                    .ThenBy(o => o.Must.Count(c => c.Subject != k.Subject) > 0)//尽量避免已经设置了必须监考的教师，以保证该教师能监考到必须监考的科目
-                    .ThenBy(o => o.Limit.Count(c=>c.Subject ==k.Subject)) //设置了避免监考的最后考虑
-                    .ThenByDescending(o => o.JiankaoTime.Contains(k.Time)) //监考老师尽量的安排同一上午或同一下午
-                    .ThenBy(o => o.Jiankao.Count) //优先选择没有安排过监考的或者监考数量最少的
+                     .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject))
+                     .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value)) //排除掉超过监考限制的教师
+                    .OrderBy(o=>o.Order)
                     .FirstOrDefault();
+
+                //var t1 = Teacher1
+                //    .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject)) //已经安排了同一科目考试监考的教师排除
+                //    .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value)) //排除掉超过监考限制的教师
+                //    .OrderByDescending(o => o.Must.Count(c=>c.Subject == k.Subject)) //优先选择设置了必须监考的教师
+                //    .ThenBy(o => o.Must.Count(c => c.Subject != k.Subject) > 0)//尽量避免已经设置了必须监考的教师，以保证该教师能监考到必须监考的科目
+                //    .ThenBy(w => w.Subject == k.Subject) //教师自己教学的科目后安排
+                //    .ThenByDescending(o => o.JiankaoTime.Contains(k.Time)) //监考老师尽量的安排同一上午或同一下午
+                //    .ThenBy(o => o.Jiankao.Count) //优先选择没有安排过监考的或者监考数量最少的
+                //    .ThenBy(o => o.Limit.Count(c => c.Subject == k.Subject)) //设置了避免监考的最后考虑
+                //    .FirstOrDefault();
 
 
                 if (t1 != null)
@@ -89,17 +106,31 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
                     t1.JiankaoTime.Add(k.Time);
                     t1.JiankaoFee.Add(k.Fee);
                 }
-
+                Teacher2.ForEach(f => {
+                    f.Order = "";
+                    f.Order += (f.Limit.Count(c => c.Subject == k.Subject) > 0) ? "01" : "00";
+                    f.Order += (f.Must.Count(c => c.Subject == k.Subject) > 0) ? "00" : "01";
+                    f.Order += (f.Must.Count(c => c.Subject != k.Subject) > 0) ? "01" : "00";
+                    f.Order += (f.Subject == k.Subject) ? "01" : "00";
+                    f.Order += (f.JiankaoTime.Contains(k.Time)) ? "00" : "01";
+                    f.Order += f.Jiankao.Count.ToString().PadLeft(3, '0');
+                });
                 var t2 = Teacher2
-                    .Where(w => w.Subject != k.Subject)
-                    .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject))
-                    .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value))
-                    .OrderByDescending(o => o.Must.Count(c => c.Subject == k.Subject))
-                    .ThenBy(o => o.Must.Count(c => c.Subject != k.Subject) > 0)
-                    .ThenBy(o => o.Limit.Count(c => c.Subject == k.Subject))
-                    .ThenByDescending(o => o.JiankaoTime.Contains(k.Time))
-                    .ThenBy(o => o.Jiankao.Count)
+                     .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject))
+                     .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value)) //排除掉超过监考限制的教师
+                    .OrderBy(o => o.Order)
                     .FirstOrDefault();
+
+                //var t2 = Teacher2
+                //    .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject))
+                //    .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value))
+                //    .OrderByDescending(o => o.Must.Count(c => c.Subject == k.Subject))
+                //    .ThenBy(o => o.Must.Count(c => c.Subject != k.Subject) > 0)
+                //    .ThenBy(w => w.Subject == k.Subject)  
+                //    .ThenByDescending(o => o.JiankaoTime.Contains(k.Time))
+                //    .ThenBy(o => o.Jiankao.Count)
+                //    .ThenBy(o => o.Limit.Count(c => c.Subject == k.Subject))
+                //    .FirstOrDefault();
                 if (t2 != null)
                 {
                     k.Teachers.Add(t2);

@@ -36,6 +36,8 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
         public List<string> JiankaoType { get; set; }
         public List<string> JiankaoTime { get; set; }
         public List<int> JiankaoFee { get; set; }
+
+        public string Order { get; set; }
     }
 
 

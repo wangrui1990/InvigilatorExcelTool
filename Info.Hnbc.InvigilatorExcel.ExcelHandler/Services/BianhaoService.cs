@@ -126,8 +126,27 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
         }
         private static List<SubjectInfo> GetCategoryByLetters(string letters, List<SubjectInfo> categories)
         {
+            if(letters.Contains("C"))
+            {
+
+            }
+            var Nums = new List<string> { "1","2","3","4","5", "6", "7", "8", "9" };
+            var result = new List<string>();
             var cletters = letters.ToArray().Select(s => s.ToString()).ToList();
-            var cs = categories.Where(w => cletters.Contains(w.Letter))
+            foreach(var c in cletters)
+            {
+                if (Nums.Contains(c))
+                {
+                    var last = result.LastOrDefault();
+                    last = last + c;
+                    result[result.Count - 1] = last;
+                }
+                else
+                {
+                    result.Add(c);
+                }
+            }
+            var cs = categories.Where(w => result.Contains(w.Letter))
                 //.Select(s => s.Subject)
                 .ToList();
 
@@ -274,8 +293,8 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
             titleStyle.Font.Size = 18;
 
             cols.Add(new ExcelColumnDto(0, 0, name+"监考安排表", 1, 1+ subjects.Count*6,style: titleStyle));
-            cols.Add(new ExcelColumnDto(1, 0, "序号", style: StyleConst.Header_Left_Top())); 
-
+            cols.Add(new ExcelColumnDto(1, 0, "序号", style: StyleConst.Header_Left_Top()));
+            subjects = subjects.OrderBy(o => subjectInfos.IndexOf(subjectInfos.FirstOrDefault(f => f.Letter == o.Split('_').FirstOrDefault()))).ToList();
             for (int i = 0; i < subjects.Count; i++)
             {
                 var s = subjects[i];
