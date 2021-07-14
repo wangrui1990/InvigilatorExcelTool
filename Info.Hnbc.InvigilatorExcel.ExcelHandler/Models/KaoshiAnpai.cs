@@ -18,6 +18,8 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
 
         public List<Room> Rooms { get; set; }
 
+        public List<KaoshiTime> KaoshiTimes { get; set; }
+
 
         public void SetJianKao()
         {
@@ -54,7 +56,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
             var ddd = kslist.Where(w=>w.Subject=="地理").ToList();
             foreach (var k in kslist)
             {
-                if (k.Subject == "生物")
+                if (k.Subject == "技术")
                 {
 
                 }
@@ -106,6 +108,9 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
                     t1.JiankaoTime.Add(k.Time);
                     t1.JiankaoFee.Add(k.Fee);
                 }
+
+
+
                 Teacher2.ForEach(f => {
                     f.Order = "";
                     f.Order += (f.Limit.Count(c => c.Subject == k.Subject) > 0) ? "01" : "00";
@@ -115,6 +120,12 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Models
                     f.Order += (f.JiankaoTime.Contains(k.Time)) ? "00" : "01";
                     f.Order += f.Jiankao.Count.ToString().PadLeft(3, '0');
                 });
+
+                var tt2 = Teacher2
+                     .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject))
+                     .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value)) //排除掉超过监考限制的教师
+                    .OrderBy(o => o.Order)
+                    .ToList();
                 var t2 = Teacher2
                      .Where(w => !w.JiankaoSubjectForAnpai.Contains(k.Subject))
                      .Where(w => !(w.LimitNum.HasValue && w.Jiankao.Count >= w.LimitNum.Value)) //排除掉超过监考限制的教师

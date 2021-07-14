@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Info.Hnbc.InvigilatorExcel.WpfClient"
         mc:Ignorable="d"
-        Title="批量监考调度程序 V3.0 ---By hnbc.info" Height="450" Width="800">
+        Title="批量监考调度程序 V3.4 ---By hnbc.info" Height="450" Width="800">
     <Grid>
 
         <Grid.RowDefinitions>

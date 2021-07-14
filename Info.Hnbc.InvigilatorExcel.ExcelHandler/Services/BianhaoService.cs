@@ -46,6 +46,10 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
                     Type = s.Type
                 };
                 dto.Time = times.FirstOrDefault(f => f.Subject == s.Subject)?.Time;
+                if(dto.Time== null)
+                {
+
+                }
                 dto.Fee = fees.FirstOrDefault(f => f.Type == s.Type)?.Fee ?? 150;
 
                 return dto;
@@ -107,7 +111,8 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
                 Teacher1 = teacher1,
                 Teacher2 = teacher2,
                 Rooms = rooms,
-                KaoshiInfos = kaoshiinfos
+                KaoshiInfos = kaoshiinfos,
+                KaoshiTimes = times
             };
         }
 
@@ -166,6 +171,10 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
             cols.Add(new ExcelColumnDto(1, 0, "学校", 2, columnWidth: 8.2, style: StyleConst.Header_Left_Bottom(),isChangeBackground:true));
             cols.Add(new ExcelColumnDto(1, 1, "教师", 2, columnWidth: 8.2, style: StyleConst.Header_Bottom(), isChangeBackground: true));
             cols.Add(new ExcelColumnDto(1, 2, "学科", 2, columnWidth: 8.2, style: StyleConst.Header_Right_Bottom(), isChangeBackground: true));
+
+            var times = ap.KaoshiTimes;
+            subjects = subjects.OrderBy(o => times.IndexOf(times.FirstOrDefault(f => f.Subject == o.Split('$').LastOrDefault()))).ToList();
+
 
             for (int i = 0; i < subjects.Count; i++)
             {
@@ -262,6 +271,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
 
         private static List<ComplexExportDto> GetTimeTongji(KaoshiAnpai ap)
         {
+            var ddd = ap.KaoshiInfos.Where(w => string.IsNullOrWhiteSpace(w.Time)).ToList();
             var result = new List<ComplexExportDto>();
             var timegroups = ap.KaoshiInfos
                 .GroupBy(g =>
@@ -272,14 +282,14 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
 
             foreach (var g in timegroups)
             {
-                var dto = GetOneDay(g.ToList(), g.Key,ap.Subjects);
+                var dto = GetOneDay(g.ToList(), g.Key,ap.Subjects,ap.KaoshiTimes);
                 result.Add(dto);
             }
             return result;
         }
 
 
-        private static ComplexExportDto GetOneDay(List<KaoshiInfo> ks,string name, List<SubjectInfo> subjectInfos)
+        private static ComplexExportDto GetOneDay(List<KaoshiInfo> ks,string name, List<SubjectInfo> subjectInfos, List<KaoshiTime> times)
         { 
             //var subjects = ks.Select(s => s.Subject + "    " + s.Type).Distinct().ToList();
             //var subjects = ks.Select(s => subjectInfos.FirstOrDefault(f=>f.Letter == s.SubjectLetter[0].ToString())?.Subject + "    " + s.Type).Distinct().ToList();
@@ -294,7 +304,10 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
 
             cols.Add(new ExcelColumnDto(0, 0, name+"监考安排表", 1, 1+ subjects.Count*6,style: titleStyle));
             cols.Add(new ExcelColumnDto(1, 0, "序号", style: StyleConst.Header_Left_Top()));
-            subjects = subjects.OrderBy(o => subjectInfos.IndexOf(subjectInfos.FirstOrDefault(f => f.Letter == o.Split('_').FirstOrDefault()))).ToList();
+            
+
+            subjects = subjects.OrderBy(o => times.IndexOf(times.FirstOrDefault(f => f.Subject == subjectInfos.FirstOrDefault(f => f.Letter == o.Split('_').FirstOrDefault())?.Subject))).ToList();
+            //subjects = subjects.OrderBy(o => subjectInfos.IndexOf(subjectInfos.FirstOrDefault(f => f.Letter == o.Split('_').FirstOrDefault()))).ToList();
             for (int i = 0; i < subjects.Count; i++)
             {
                 var s = subjects[i];
@@ -316,7 +329,7 @@ namespace Info.Hnbc.InvigilatorExcel.ExcelHandler.Services
                     if(index>= data.Count)
                     {
                         row = new List<RowData>();
-                        row.Add(new RowData(0, (index+1).ToString(), style: StyleConst.BaseItemStyle()));
+                        row.Add(new RowData(0, (index+1).ToString(), style: StyleConst.Item_Left()));
                         data.Add(row);
                     }
                     else

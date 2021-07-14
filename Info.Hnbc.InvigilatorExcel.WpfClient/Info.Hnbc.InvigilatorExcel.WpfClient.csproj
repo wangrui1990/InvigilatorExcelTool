@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyName>监考调度3.0</AssemblyName>
+    <AssemblyName>监考调度3.4</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
